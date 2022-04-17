@@ -15,8 +15,8 @@ compileTestJava {
 
 dependencies {
     // Selenide
-    testImplementation("com.codeborne:selenide:6.3.3")
-    testRuntimeOnly("org.slf4j:slf4j-simple:1.7.32")
+    testImplementation("com.codeborne:selenide:6.4.0")
+    testRuntimeOnly("org.slf4j:slf4j-simple:1.7.36")
 
 
     // JUnit 5

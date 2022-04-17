@@ -1,16 +1,14 @@
 package litres;
 
+import com.codeborne.selenide.Condition;
+import litres.domain.MenuItem;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.*;
 
 import java.util.stream.Stream;
 
 import static com.codeborne.selenide.Condition.text;
-import static com.codeborne.selenide.Condition.visible;
 import static com.codeborne.selenide.Selenide.*;
 
 public class ParameterizedSearchTest {
@@ -28,8 +26,8 @@ public class ParameterizedSearchTest {
     @ValueSource(strings = {"Таинственная история Билли Миллигана", "Американская трагедия"})
     @ParameterizedTest(name = "Проверка отображения поисковых результатов запроса \"{0}\"")
     void commonSearchTest(String testData) {
-        $("[class=Search-module__input]").setValue(testData).pressEnter();
-        $(".b_search").shouldHave(text(testData)).shouldBe(visible);
+        $(".Search-module__input").setValue(testData).pressEnter();
+        $(".result_container").shouldHave(text(testData));
     }
 
     @CsvSource(value = {
@@ -38,8 +36,8 @@ public class ParameterizedSearchTest {
     }, delimiter = '|')
     @ParameterizedTest(name = "Проверка поисковых результатов запроса\"{0}\"")
     void complexSearchTest(String testData, String expectedText) {
-        $("[class=Search-module__input]").setValue(testData).pressEnter();
-        $(".b_search").shouldHave(text(expectedText)).shouldBe(visible);
+        $(".Search-module__input").setValue(testData).pressEnter();
+        $(".result_container").shouldHave(text(expectedText));
     }
 
     static Stream<Arguments> mixedArgumentsTestDataProvider() {
@@ -52,8 +50,18 @@ public class ParameterizedSearchTest {
     @MethodSource(value = "mixedArgumentsTestDataProvider")
     @ParameterizedTest(name = "Проверка поисковых результатов запроса \"{0}\"")
     void mixedArgumentsTest(String firstArg, String secondArg) {
-        $("[class=Search-module__input]").setValue(firstArg).pressEnter();
-        $(".b_search").shouldHave(text(firstArg)).shouldBe(visible);
-        $(".b_search").shouldHave(text(secondArg)).shouldBe(visible);
+        $(".Search-module__input").setValue(firstArg).pressEnter();
+        $(".result_container").shouldHave(text(firstArg));
+        $(".result_container").shouldHave(text(secondArg));
+    }
+
+    @EnumSource(MenuItem.class)
+    @ParameterizedTest()
+    void commonSearchMenuTest(MenuItem testData) {
+        $(".Search-module__input").setValue("Американская трагедия").pressEnter();
+        $$("#result-tabs li")
+                .find(Condition.text(testData.rusName))
+                .click();
+        $(".tab-active").shouldHave(text(testData.rusName));
     }
 }
