@@ -1,11 +1,10 @@
 package litres;
 
+import com.codeborne.selenide.Condition;
+import litres.domain.MenuItem;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.CsvSource;
-import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.*;
 
 import java.util.stream.Stream;
 
@@ -54,5 +53,15 @@ public class ParameterizedSearchTest {
         $(".Search-module__input").setValue(firstArg).pressEnter();
         $(".result_container").shouldHave(text(firstArg));
         $(".result_container").shouldHave(text(secondArg));
+    }
+
+    @EnumSource(MenuItem.class)
+    @ParameterizedTest()
+    void commonSearchMenuTest(MenuItem testData) {
+        $(".Search-module__input").setValue("Американская трагедия").pressEnter();
+        $$("#result-tabs li")
+                .find(Condition.text(testData.rusName))
+                .click();
+        $(".tab-active").shouldHave(text(testData.rusName));
     }
 }
